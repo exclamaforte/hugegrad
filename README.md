@@ -1,3 +1,3 @@
-Yet Another Machine Learning Framework
+Do it bigly with the hottest new C++ ML Framework.
 
-Mostly for learning. Might do some interesting things eventually.
+Mostly for learning.
