@@ -3,12 +3,14 @@
 // better estimates coming from being as small as possible
 template <typename T> constexpr T epsilon;
 
-template <> constexpr float epsilon<float> = 0.000001f;
-template <> constexpr double epsilon<double> = 0.00000001;
+template <> constexpr float epsilon<float> = 0.001f;
+template <> constexpr double epsilon<double> = 0.001;
 
+
+//calculate using the symmetric difference quotient
 template <typename T>
 std::function<T(T)> derivative(std::function<T(T)> f)
 {
   constexpr T h = epsilon<T>;
-  return [h,f] (T x) { return (f(x + h) - f(x - h)) / 2 * h; };
+  return [h, f](T x) { return (f(x + h) - f(x - h)) / (2 * h); };
 }

@@ -6,7 +6,14 @@ Mostly for learning.
 
 Accomplishes hundreds of lines of python in thousands of lines of C++.
 
+## Build
+cmake -S . -B ./build
+cmake --build build
 
-TODO learn templates
-TODO go through Karpathy tutorial
-TODO Implement Autograd
+## Test
+ctest --test-dir build/test
+
+
+- TODO learn modern templates
+- TODO go through Karpathy tutorial
+- TODO Implement Autograd
