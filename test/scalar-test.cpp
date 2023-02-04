@@ -8,11 +8,13 @@ protected:
     y = ScalarValue<short>(5);
     z = ScalarValue<int>(100);
     a = ScalarValue<short>(100);
+    b = ScalarValue<int>(-100);
   }
   ScalarValue<int> x;
   ScalarValue<short> y;
   ScalarValue<int> z;
   ScalarValue<short> a;
+  ScalarValue<int> b;
 };
 
 
@@ -33,4 +35,11 @@ TEST_F(ScalarTest, addition) {
   ScalarValue<short> result2(5 + 5);
   EXPECT_EQ(x + y, result);
   EXPECT_EQ(y + y, result2);
+}
+
+TEST_F(ScalarTest, multiplication) {
+  ScalarValue<int> result(-100 * 5);
+  ScalarValue<short> result2(5 * 5);
+  EXPECT_EQ(b * y, result) << fmt::format("{}, {}", x * y, result);
+  EXPECT_EQ(y * y, result2);
 }

@@ -19,6 +19,12 @@ struct ScalarValue
     return result;
   }
 
+  template <typename K>
+  ScalarValue<T> operator*(const ScalarValue<K> &other) {
+    ScalarValue<T> result(data * other.data);
+    return result;
+  }
+
   template<typename K>
   bool operator==(const ScalarValue<K>& other) const
   {
