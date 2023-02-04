@@ -27,3 +27,10 @@ TEST_F(ScalarTest, equality) {
   EXPECT_EQ(x, a);
   EXPECT_NE(x, y);
 }
+
+TEST_F(ScalarTest, addition) {
+  ScalarValue<long> result(100 + 5);
+  ScalarValue<short> result2(5 + 5);
+  EXPECT_EQ(x + y, result);
+  EXPECT_EQ(y + y, result2);
+}
