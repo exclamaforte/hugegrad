@@ -11,6 +11,8 @@ template <> constexpr double epsilon<double> = 0.001;
 template <typename T>
 std::function<T(T)> derivative(std::function<T(T)> f)
 {
-  constexpr T h = epsilon<T>;
-  return [h, f](T x) { return (f(x + h) - f(x - h)) / (2 * h); };
+  return [f](T x) {
+    constexpr T h = epsilon<T>;
+    return (f(x + h) - f(x - h)) / (2 * h);
+  };
 }

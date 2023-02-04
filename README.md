@@ -7,8 +7,7 @@ Mostly for learning.
 Accomplishes hundreds of lines of python in thousands of lines of C++.
 
 ## Build
-cmake -S . -B ./build
-cmake --build build
+cmake -S . -B ./build && cmake --build build
 
 ## Test
 ctest --test-dir build/test
