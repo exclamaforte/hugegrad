@@ -4,23 +4,20 @@
 class ScalarTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    x = ScalarValue<int>(100);
-    y = ScalarValue<short>(5);
-    z = ScalarValue<int>(100);
-    a = ScalarValue<short>(100);
-    b = ScalarValue<int>(-100);
+    x = make_scalar<int>(100);
+    y = make_scalar<short>(5);
+    z = make_scalar<int>(100);
+    a = make_scalar<short>(100);
+    b = make_scalar<int>(-100);
+
   }
-  ScalarValue<int> x;
-  ScalarValue<short> y;
-  ScalarValue<int> z;
-  ScalarValue<short> a;
-  ScalarValue<int> b;
+  std::shared_ptr<ScalarValue<int>> x;
+  std::shared_ptr<ScalarValue<short>> y;
+  std::shared_ptr<ScalarValue<int>> z;
+  std::shared_ptr<ScalarValue<short>> a;
+  std::shared_ptr<ScalarValue<int>> b;
+
 };
-
-
-TEST_F(ScalarTest, formatting) {
-  EXPECT_EQ(fmt::format("{}", x), "Value(data=100)");
-}
 
 TEST_F(ScalarTest, equality) {
   EXPECT_EQ(x, x);
@@ -30,16 +27,41 @@ TEST_F(ScalarTest, equality) {
   EXPECT_NE(x, y);
 }
 
+TEST_F(ScalarTest, formatting) {
+  EXPECT_EQ(fmt::format("{}", x), "Value(data=100)");
+}
+
 TEST_F(ScalarTest, addition) {
-  ScalarValue<long> result(100 + 5);
-  ScalarValue<short> result2(5 + 5);
-  EXPECT_EQ(x + y, result);
+  auto result = make_scalar(100 + 100);
+  auto result2 = make_scalar(5 + 5);
+  EXPECT_EQ(x + x, result);
   EXPECT_EQ(y + y, result2);
 }
 
 TEST_F(ScalarTest, multiplication) {
-  ScalarValue<int> result(-100 * 5);
-  ScalarValue<short> result2(5 * 5);
-  EXPECT_EQ(b * y, result) << fmt::format("{}, {}", x * y, result);
+  auto result = make_scalar(-100 * 100);
+  auto result2 = make_scalar(5 * 5);
+  EXPECT_EQ(b * x, result) << fmt::format("{}, {}", b * x, result);
   EXPECT_EQ(y * y, result2);
 }
+
+TEST_F(ScalarTest, test_children) {
+  auto mul = x * x;
+  EXPECT_EQ(mul->child1, mul->child2);
+  auto mul2 = x * z;
+  EXPECT_EQ(mul2->child1, mul2->child2);
+}
+
+/*
+TEST_F(ScalarTest, graphviz) {
+  auto xx = x * z + x;
+  fmt::print("hello world!\n");
+  std::string v = xx->gen_vis();
+  fmt::print(v);
+  EXPECT_EQ(v, "arst");
+}
+*/
+
+/*
+ x * y + b
+ */
