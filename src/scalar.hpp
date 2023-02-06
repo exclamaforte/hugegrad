@@ -20,6 +20,7 @@ struct ScalarValue
   WrapperType child2;
   Operation op;
   T data;
+  T grad;
   std::string label;
 
   ScalarValue(T data) : data(data), op(Operation::None) {}
@@ -97,7 +98,7 @@ template <typename T>
 void rec_helper(std::shared_ptr<ScalarValue<T>> *val, void *parent,
                 std::back_insert_iterator<std::string> c) {
   void *val_void = static_cast<void *>(val);
-  fmt::format_to(c, "id{} [label=\"{}|{}\"]\n", val_void, val->label, val->data);
+  fmt::format_to(c, "id{} [label=\"{} | {} | {}\"]\n", val_void, val->label, val->data, val->grad);
   if (parent) {
     fmt::format_to(c, "id{} -> id{}\n", val_void, parent);
   }
