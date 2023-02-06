@@ -15,33 +15,6 @@ struct ScalarValue
   using WrapperType = std::shared_ptr<ScalarValue<T>>;
 
 
-  static void rec_helper(ScalarValue<T> *val, void *parent,
-                         std::back_insert_iterator<std::string> c)
-  {
-    void *val_void = static_cast<void*>(val);
-    fmt::format_to(c, "id{} [label=\"{}\"]\n", val_void, val->data);
-    if (parent) {
-      fmt::format_to(c, "id{} -> id{}\n", val_void, parent);
-    }
-    if (val->op != Operation::None) {
-      void *op_id = &val->op;
-      fmt::format_to(c, "id{} [label='{}']\n id{} -> id{}\n", op_id, val->op, op_id, val_void);
-      if (val->child1) {
-        rec_helper(val->child1.get(), op_id, c);
-      }
-      if (val->child2) {
-        rec_helper(val->child2.get(), op_id, c);
-      }
-    }
-  }
-
-  std::string gen_vis()
-  {
-    std::string result = "";
-    rec_helper(this, nullptr, std::back_inserter(result));
-    fmt::print("here\n");
-    return fmt::format("{}", result);
-  }
 
   WrapperType child1;
   WrapperType child2;
@@ -117,4 +90,32 @@ bool operator==(const std::shared_ptr<ScalarValue<K>> left, const std::shared_pt
 template <typename K, typename T>
 bool operator!=(const std::shared_ptr<ScalarValue<K>> left, const std::shared_ptr<ScalarValue<T>> right) {
   return left->data != right->data;
+}
+
+template <typename T>
+void rec_helper(std::shared_ptr<ScalarValue<T>> *val, void *parent,
+                std::back_insert_iterator<std::string> c) {
+  void *val_void = static_cast<void *>(val);
+  fmt::format_to(c, "id{} [label=\"{}\"]\n", val_void, val->data);
+  if (parent) {
+    fmt::format_to(c, "id{} -> id{}\n", val_void, parent);
+  }
+  if (val->op != Operation::None) {
+    void *op_id = &val->op;
+    fmt::format_to(c, "id{} [label='{}']\n id{} -> id{}\n", op_id, val->op,
+                   op_id, val_void);
+    if (val->child1) {
+      rec_helper(val->child1, op_id, c);
+    }
+    if (val->child2) {
+      rec_helper(val->child2, op_id, c);
+    }
+  }
+}
+
+template <typename T>
+std::string gen_vis(std::shared_ptr<ScalarValue<T>> vis) {
+  std::string result = "";
+  rec_helper(vis, nullptr, std::back_inserter(result));
+  return fmt::format("{}", result);
 }
