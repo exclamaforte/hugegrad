@@ -20,11 +20,12 @@ struct ScalarValue
   WrapperType child2;
   Operation op;
   T data;
+  std::string label;
 
   ScalarValue(T data) : data(data), op(Operation::None) {}
 
-  ScalarValue(T data, WrapperType &child1, WrapperType &child2, Operation op)
-      : data(data), op(op), child1(child1), child2(child2) {}
+  ScalarValue(T data, WrapperType &child1, WrapperType &child2, Operation op, std::string& label)
+    : data(data), op(op), child1(child1), child2(child2), label(label) {}
   ScalarValue() = default;
 };
 
@@ -37,8 +38,8 @@ std::shared_ptr<ScalarValue<T>> make_scalar(T data)
 template <typename T>
 std::shared_ptr<ScalarValue<T>> make_scalar(T data, std::shared_ptr<ScalarValue<T>> &child1,
                                             std::shared_ptr<ScalarValue<T>> &child2,
-                                            Operation op) {
-  return std::shared_ptr<ScalarValue<T>>(new ScalarValue<T>(data, child1, child2, op));
+                                            Operation op, std::string &label) {
+  return std::shared_ptr<ScalarValue<T>>(new ScalarValue<T>(data, child1, child2, op, label));
 }
 
 template <typename T>
@@ -96,7 +97,7 @@ template <typename T>
 void rec_helper(std::shared_ptr<ScalarValue<T>> *val, void *parent,
                 std::back_insert_iterator<std::string> c) {
   void *val_void = static_cast<void *>(val);
-  fmt::format_to(c, "id{} [label=\"{}\"]\n", val_void, val->data);
+  fmt::format_to(c, "id{} [label=\"{}|{}\"]\n", val_void, val->label, val->data);
   if (parent) {
     fmt::format_to(c, "id{} -> id{}\n", val_void, parent);
   }
