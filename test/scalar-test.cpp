@@ -53,3 +53,17 @@ TEST_F(ScalarTest, test_children) {
   auto mul2 = x * z;
   EXPECT_EQ(mul2->child1, mul2->child2);
 }
+
+TEST_F(ScalarTest, backprop1) {
+  auto a = make_scalar<float>(2.0, "a");
+  auto b = make_scalar<float>(-3.0, "b");
+  auto c = make_scalar<float>(10.0, "c");
+  auto e = a * b;
+  e->label = "e";
+  auto d = e + c;
+  d->label = "d";
+  auto f = make_scalar<float>(-2.0, "f");
+  auto L = d * f;
+  L->label = "L";
+  L->backprop(1);
+}

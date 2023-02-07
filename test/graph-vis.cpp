@@ -1,10 +1,13 @@
 #include "gen-vis.hpp"
 #include "scalar.hpp"
 int main() {
-  auto x = make_scalar<int>(10);
-  auto y = make_scalar<int>(-20);
-  auto xx = make_scalar<int>(-30);
-  auto z = x * y + xx;
-  z->backprop(1);
-  write_vis(z);
+  auto a = make_scalar<float>(2.0, "a");
+  auto b = make_scalar<float>(-3.0, "b");
+  auto c = make_scalar<float>(10.0, "c");
+  auto e = a * b; e->label = "e";
+  auto d = e + c; d->label = "d";
+  auto f = make_scalar<float>(-2.0, "f");
+  auto L = d * f; L->label = "L";
+  L->backprop(1);
+  write_vis(L);
 }

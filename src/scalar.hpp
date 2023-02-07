@@ -66,6 +66,10 @@ template <typename T> std::shared_ptr<ScalarValue<T>> make_scalar(T data) {
   return std::shared_ptr<ScalarValue<T>>(new ScalarValue<T>(data));
 }
 
+template <typename T> std::shared_ptr<ScalarValue<T>> make_scalar(T data, std::string label) {
+  return std::shared_ptr<ScalarValue<T>>(new ScalarValue<T>(data, label));
+}
+
 template <typename T>
 std::shared_ptr<ScalarValue<T>>
 make_scalar(T data, std::shared_ptr<ScalarValue<T>> &child1,
