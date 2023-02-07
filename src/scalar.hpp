@@ -21,6 +21,7 @@ template <typename T> struct ScalarValue {
   // call on the final node in the computation
   // TODO what happens when a variable is used in multiple "paths" of
   // computation
+  // derivative of anything with respect to itself is 1
   void backprop(T prev_grad = 1, Operation prev_op = Operation::None) {
     switch (prev_op) {
     case Operation::Add:
