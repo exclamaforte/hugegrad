@@ -1,3 +1,4 @@
+#pragma once
 #include <functional>
 // epsilons set to balance error in floating point math with
 // better estimates coming from being as small as possible
