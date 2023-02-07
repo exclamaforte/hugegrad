@@ -4,12 +4,12 @@
 class ScalarTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    x = make_scalar<int>(100);
-    y = make_scalar<short>(5);
-    yy = make_scalar<short>(5);
-    z = make_scalar<int>(100);
-    a = make_scalar<short>(100);
-    b = make_scalar<int>(-100);
+    x = make_scalar<int>(100, "x");
+    y = make_scalar<short>(5, "y");
+    yy = make_scalar<short>(5, "yy");
+    z = make_scalar<int>(100, "z");
+    a = make_scalar<short>(100, "a");
+    b = make_scalar<int>(-100, "b");
 
   }
   std::shared_ptr<ScalarValue<int>> x;
@@ -30,7 +30,7 @@ TEST_F(ScalarTest, equality) {
 }
 
 TEST_F(ScalarTest, formatting) {
-  EXPECT_EQ(fmt::format("{}", x), "Value(data=100)");
+  EXPECT_EQ(fmt::format("{}", x), "x(data=100, grad=0)");
 }
 
 TEST_F(ScalarTest, addition) {
@@ -65,5 +65,13 @@ TEST_F(ScalarTest, backprop1) {
   auto f = make_scalar<float>(-2.0, "f");
   auto L = d * f;
   L->label = "L";
-  L->backprop(1);
+  L->compute_grad(1.0);
+  EXPECT_FLOAT_EQ(L->grad, 1.0);
+  EXPECT_FLOAT_EQ(d->grad, -2.0);
+  EXPECT_FLOAT_EQ(f->grad, 4.0);
+  EXPECT_FLOAT_EQ(c->grad, -2.0);
+  EXPECT_FLOAT_EQ(e->grad, -2.0);
+  EXPECT_FLOAT_EQ(b->grad, -4.0);
+  EXPECT_FLOAT_EQ(a->grad, 6.0);
+  
 }

@@ -13,6 +13,5 @@ cmake -S . -B ./build && cmake --build build
 ctest --test-dir build/test
 
 
-- TODO learn modern templates
+- TODO add support for tensors
 - TODO go through Karpathy tutorial
-- TODO Implement Autograd

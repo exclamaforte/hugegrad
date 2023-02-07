@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h>
 #include "operation.hpp"
 #include <fmt/format.h>
 #include <memory>
@@ -17,29 +18,44 @@ template <typename T> struct ScalarValue {
   // aka "gradient"
   T grad;
   std::string label;
+  // whether or not this value has been seen in the back-prop calculation before
+  bool seen;
+
+  void clear_back() {
+    grad = 0;
+    seen = false;
+    if (op != Operation::None) {
+      child1->clear_back();
+      child2->clear_back();
+    }
+  }
+  void step(T learning_rate) {
+  }
 
   // call on the final node in the computation
   // TODO what happens when a variable is used in multiple "paths" of
   // computation
   // derivative of anything with respect to itself is 1
-  void backprop(T prev_grad = 1, Operation prev_op = Operation::None) {
-    switch (prev_op) {
+  void compute_grad(T prev_grad = 1) {
+    if (seen) {
+      throw new std::runtime_error(fmt::format("node {} has been seen before, aborting", label));
+    }
+    seen = true;
+    grad += prev_grad;
+    switch (op) {
     case Operation::Add:
-      grad = prev_grad;
+      child1->backprop(grad);
+      child2->backprop(grad);
       break;
     case Operation::Mul:
-      grad = prev_grad * data;
+      child1->backprop(child2->data * grad);
+      child2->backprop(child1->data * grad);
       break;
     case Operation::None:
-      grad = prev_grad;
       break;
     default:
       grad = 0;
       break;
-    }
-    if (op != Operation::None) {
-      child1->backprop(grad, op);
-      child2->backprop(grad, op);
     }
   }
 
