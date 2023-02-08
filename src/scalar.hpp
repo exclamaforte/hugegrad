@@ -17,9 +17,9 @@ struct ScalarValue {
   // TODO make this a pointer
   Operation::Operation<T>* op;
   // aka "activation"
-  T data;
+  T data = 0;
   // aka "gradient"
-  T grad;
+  T grad = 0;
   std::string label;
   // whether or not this value has been seen in the back-prop calculation before
   bool seen = false;
@@ -53,7 +53,6 @@ struct ScalarValue {
       break;
     case Operation::OpType::UNARY:
       child1->compute_grad(op->backward(grad, child1->data, child2->data));
-      //child1->compute_grad((1 - pow(my_tanh(child1->data), 2)) * grad);
       break;
     case Operation::OpType::NONE:
       break;
@@ -164,7 +163,7 @@ operator*(std::shared_ptr<ScalarValue<T>> left,
 
 template <typename T>
 std::shared_ptr<ScalarValue<T>>
-pow(std::shared_ptr<T> val, T power) {
+pow(std::shared_ptr<ScalarValue<T>> val, T power) {
   std::shared_ptr<ScalarValue<T>> tmp;
   auto op_ptr = Operation::pow_cache<T>(power);
   return make_scalar(op_ptr->forward(val->data, 0), val, tmp, op_ptr);
@@ -178,10 +177,21 @@ operator/(std::shared_ptr<ScalarValue<T>> num,
 }
 */
 
-template <typename K, typename T>
-bool operator==(const std::shared_ptr<ScalarValue<K>> &left,
+template <typename T>
+bool operator==(const std::shared_ptr<ScalarValue<T>> &left,
                 const std::shared_ptr<ScalarValue<T>> &right) {
   return left->data == right->data;
+}
+
+template <typename T>
+bool operator==(const std::shared_ptr<ScalarValue<T>> &left,
+                const T &right) {
+  return left->data == right;
+}
+template <typename T>
+bool operator==(const T &left,
+                const std::shared_ptr<ScalarValue<T>> &right) {
+  return left == right->data;
 }
 
 template <typename K, typename T>

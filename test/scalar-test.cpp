@@ -68,6 +68,9 @@ TEST_F(ScalarTest, exp) {
   EXPECT_EQ(e, ee);
 }
 TEST_F(ScalarTest, pow) {
+  auto v = pow(x, 2);
+  int result = 10000;
+  EXPECT_EQ(v, result);
 }
 
 TEST_F(ScalarTest, div) {
