@@ -13,9 +13,9 @@ void rec_helper(std::shared_ptr<Scalar::ScalarValue<T>> &val, void *parent,
   if (parent) {
     fmt::format_to(c, "id{} -> id{}\n", val_void, parent);
   }
-  if (val->op != OpType::None) {
+  if (val->op->type != Operation::OpType::NONE) {
     void *op_id = &val->op;
-    fmt::format_to(c, "id{} [label=\"{}\"]\n id{} -> id{}\n", op_id, val->op,
+    fmt::format_to(c, "id{} [label=\"{}\"]\n id{} -> id{}\n", op_id, *val->op,
                    op_id, val_void);
     if (val->child1) {
       rec_helper(val->child1, op_id, c);
