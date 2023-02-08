@@ -1,5 +1,6 @@
 #include "scalar.hpp"
 #include <gtest/gtest.h>
+using namespace Scalar;
 
 class ScalarTest : public ::testing::Test {
 protected:
@@ -40,6 +41,13 @@ TEST_F(ScalarTest, addition) {
   EXPECT_EQ(y + yy, result2);
 }
 
+TEST_F(ScalarTest, constant_addition) {
+  auto result = make_scalar(100 + 1);
+  auto result2 = make_scalar(5 + 2);
+  EXPECT_EQ(x + 1, result);
+  EXPECT_EQ(static_cast<short>(2) + y, result2);
+}
+
 TEST_F(ScalarTest, multiplication) {
   auto result = make_scalar(-100 * 100);
   auto result2 = make_scalar(5 * 5);
@@ -52,6 +60,14 @@ TEST_F(ScalarTest, test_children) {
   EXPECT_EQ(mul->child1, mul->child2);
   auto mul2 = x * z;
   EXPECT_EQ(mul2->child1, mul2->child2);
+}
+TEST_F(ScalarTest, exp) {
+  auto x = make_scalar<double>(1.0);
+  auto e = exp(x);
+  auto ee = make_scalar<double>(std::exp(1.0));
+  EXPECT_EQ(e, ee);
+}
+TEST_F(ScalarTest, div) {
 }
 
 TEST_F(ScalarTest, backprop1) {
@@ -73,5 +89,34 @@ TEST_F(ScalarTest, backprop1) {
   EXPECT_FLOAT_EQ(e->grad, -2.0);
   EXPECT_FLOAT_EQ(b->grad, -4.0);
   EXPECT_FLOAT_EQ(a->grad, 6.0);
-  
+}
+
+TEST_F(ScalarTest, backprop2) {
+  auto x1 = make_scalar<float>(2.0, "x1");
+  auto x2 = make_scalar<float>(0.0, "x2");
+  auto w1 = make_scalar<float>(-3.0, "w1");
+  auto w2 = make_scalar<float>(1.0, "w2");
+  auto b = make_scalar<float>(6.8813735870195432, "b");
+  auto x1w1 = x1 * w1;
+  x1w1->label = "x1w1";
+  auto x2w2 = x2 * w2;
+  x2w2->label = "x2w2";
+  auto sum = x1w1 + x2w2;
+  sum->label = "x1w1 + x2w2";
+  auto n = sum + b;
+  n->label = "x1w1 + x2w2 + b";
+  auto o = tanh(n);
+  o->label = "output";
+  o->compute_grad();
+  EXPECT_FLOAT_EQ(o->data, 0.70710671);
+  EXPECT_FLOAT_EQ(o->grad, 1.0);
+  EXPECT_FLOAT_EQ(n->grad, 0.5);
+  EXPECT_FLOAT_EQ(b->grad, 0.5);
+  EXPECT_FLOAT_EQ(sum->grad, 0.5);
+  EXPECT_FLOAT_EQ(x1w1->grad, 0.5);
+  EXPECT_FLOAT_EQ(x2w2->grad, 0.5);
+  EXPECT_FLOAT_EQ(x2->grad, 0.5);
+  EXPECT_FLOAT_EQ(w2->grad, 0.0);
+  EXPECT_FLOAT_EQ(x1->grad, -1.5);
+  EXPECT_FLOAT_EQ(w1->grad, 1.0);
 }
