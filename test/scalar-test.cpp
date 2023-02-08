@@ -67,6 +67,9 @@ TEST_F(ScalarTest, exp) {
   auto ee = make_scalar<double>(std::exp(1.0));
   EXPECT_EQ(e, ee);
 }
+TEST_F(ScalarTest, pow) {
+}
+
 TEST_F(ScalarTest, div) {
 }
 

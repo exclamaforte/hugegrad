@@ -34,7 +34,6 @@ struct ScalarValue {
   }
   void step(T learning_rate)
   {
-    
   }
 
   // derivative of anything with respect to itself is 1
@@ -165,6 +164,13 @@ operator*(std::shared_ptr<ScalarValue<K>> left,
   K data = left->data * right->data;
   auto right_val = make_scalar(right);
   return make_scalar(data, left, right_val, OpType::Mul);
+}
+
+template <typename T>
+pow(std::shared_ptr<T> val, T power)
+{
+  std::shared_ptr<ScalarValue<T>> tmp;
+  return make_scalar(std::pow(val, power), val, tmp, OpType::Pow);
 }
 /*
 template <typename T>
