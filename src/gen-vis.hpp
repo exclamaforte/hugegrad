@@ -6,7 +6,7 @@
 #include <string>
 
 template <typename T>
-void rec_helper(std::shared_ptr<Scalar::ScalarValue<T>> &val, void *parent,
+void rec_helper(std::shared_ptr<ScalarNS::ScalarValue<T>> &val, void *parent,
                 std::back_insert_iterator<std::string> c) {
   void *val_void = static_cast<void *>(val.get());
   fmt::format_to(c, "id{} [label=\"{}\"]\n", val_void, val);
@@ -27,14 +27,14 @@ void rec_helper(std::shared_ptr<Scalar::ScalarValue<T>> &val, void *parent,
 }
 
 template <typename T>
-std::string gen_vis(std::shared_ptr<Scalar::ScalarValue<T>> &vis) {
+std::string gen_vis(std::shared_ptr<ScalarNS::ScalarValue<T>> &vis) {
   std::string result = "";
   rec_helper(vis, nullptr, std::back_inserter(result));
   return fmt::format("{}", result);
 }
 
 template <typename T>
-void write_vis(std::shared_ptr<Scalar::ScalarValue<T>> &val) {
+void write_vis(std::shared_ptr<ScalarNS::ScalarValue<T>> &val) {
   std::ofstream myfile;
   fmt::print("opening file...\n");
   myfile.open("graphvis.dot", std::ios::in | std::ios::trunc);

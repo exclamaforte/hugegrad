@@ -1,6 +1,6 @@
 #include "gen-vis.hpp"
 #include "scalar.hpp"
-using namespace Scalar;
+using namespace ScalarNS;
 void example1() {
   auto a = make_scalar<float>(2.0, "a");
   auto b = make_scalar<float>(-3.0, "b");

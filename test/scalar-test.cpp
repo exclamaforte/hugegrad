@@ -1,6 +1,7 @@
 #include "scalar.hpp"
+#include "topo.hpp"
 #include <gtest/gtest.h>
-using namespace Scalar;
+using namespace ScalarNS;
 
 class ScalarTest : public ::testing::Test {
 protected:
@@ -14,14 +15,14 @@ protected:
     f = make_scalar<float>(-100.0, "f");
     f2 = make_scalar<float>(100.0, "f");
   }
-  std::shared_ptr<ScalarValue<int>> x;
-  std::shared_ptr<ScalarValue<short>> y;
-  std::shared_ptr<ScalarValue<short>> yy;
-  std::shared_ptr<ScalarValue<int>> z;
-  std::shared_ptr<ScalarValue<short>> a;
-  std::shared_ptr<ScalarValue<int>> b;
-  std::shared_ptr<ScalarValue<float>> f;
-  std::shared_ptr<ScalarValue<float>> f2;
+  Scalar<int> x;
+  Scalar<short> y;
+  Scalar<short> yy;
+  Scalar<int> z;
+  Scalar<short> a;
+  Scalar<int> b;
+  Scalar<float> f;
+  Scalar<float> f2;
 };
 
 TEST_F(ScalarTest, equality) {
@@ -148,4 +149,35 @@ TEST_F(ScalarTest, backprop2) {
   EXPECT_FLOAT_EQ(w1->grad, 1.0);
 }
 
+TEST_F(ScalarTest, backprop3) {
+  auto x1 = make_scalar<float>(2.0, "x1");
+  auto x2 = make_scalar<float>(0.0, "x2");
+  auto w1 = make_scalar<float>(-3.0, "w1");
+  auto w2 = make_scalar<float>(1.0, "w2");
+  auto b = make_scalar<float>(6.8813735870195432, "b");
+  auto x1w1 = x1 * w1;
+  x1w1->label = "x1w1";
+  auto x2w2 = x2 * w2;
+  x2w2->label = "x2w2";
+  auto sum = x1w1 + x2w2;
+  sum->label = "x1w1 + x2w2";
+  auto n = sum + b;
+  n->label = "x1w1 + x2w2 + b";
+  auto o = tanh(n);
+  o->label = "output";
+
+  backpropagate({o});
+  EXPECT_FLOAT_EQ(o->data, 0.70710671);
+  EXPECT_FLOAT_EQ(o->grad, 1.0);
+  EXPECT_FLOAT_EQ(n->grad, 0.5);
+  EXPECT_FLOAT_EQ(b->grad, 0.5);
+  EXPECT_FLOAT_EQ(sum->grad, 0.5);
+  EXPECT_FLOAT_EQ(x1w1->grad, 0.5);
+  EXPECT_FLOAT_EQ(x2w2->grad, 0.5);
+  EXPECT_FLOAT_EQ(x2->grad, 0.5);
+  EXPECT_FLOAT_EQ(w2->grad, 0.0);
+  EXPECT_FLOAT_EQ(x1->grad, -1.5);
+  EXPECT_FLOAT_EQ(w1->grad, 1.0);
+}
+// TODO multiple output test
 // TODO exp backprop test
