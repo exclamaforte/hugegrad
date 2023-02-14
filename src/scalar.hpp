@@ -14,12 +14,14 @@ struct ScalarValue {
   using WrapperType = std::shared_ptr<ScalarValue<T>>;
   WrapperType child1;
   WrapperType child2;
-  // TODO make this a pointer
+
   Operation::Operation<T>* op;
+
   // aka "activation"
   T data = 0;
   // aka "gradient"
   T grad = 0;
+
   std::string label;
   // whether or not this value has been seen in the back-prop calculation before
   bool seen = false;
@@ -38,21 +40,22 @@ struct ScalarValue {
 
   // derivative of anything with respect to itself is 1
   void compute_grad(T prev_grad = 1) {
+    //fmt::print("{}\n", *this);
     // TODO implement topological sort
     if (seen) {
+      //fmt::print("throwing\n");
       throw new std::runtime_error(fmt::format("node {} has been seen before, aborting", label));
     }
     seen = true;
     grad += prev_grad;
-    // TODO use polymorphism and move this into Operation class
-    switch (op->type) {
+    switch (op->get_type()) {
       // binary
     case Operation::OpType::BINARY:
       child1->compute_grad(op->backward(grad, child1->data, child2->data));
       child2->compute_grad(op->backward(grad, child2->data, child1->data));
       break;
     case Operation::OpType::UNARY:
-      child1->compute_grad(op->backward(grad, child1->data, child2->data));
+      child1->compute_grad(op->backward(grad, child1->data, 0));
       break;
     case Operation::OpType::NONE:
       break;
@@ -165,17 +168,17 @@ template <typename T>
 std::shared_ptr<ScalarValue<T>>
 pow(std::shared_ptr<ScalarValue<T>> val, T power) {
   std::shared_ptr<ScalarValue<T>> tmp;
-  auto op_ptr = Operation::pow_cache<T>(power);
+  auto op_ptr = Operation::pow_cache<T>.get(power);
   return make_scalar(op_ptr->forward(val->data, 0), val, tmp, op_ptr);
 }
-/*
-template <typename T>
+
+// TODO expand
+template <std::floating_point T>
 std::shared_ptr<ScalarValue<T>>
 operator/(std::shared_ptr<ScalarValue<T>> num,
           std::shared_ptr<ScalarValue<T>> den) {
-  return num * pow(den, -1);
+  return num * pow(den, static_cast<T>(-1.0));
 }
-*/
 
 template <typename T>
 bool operator==(const std::shared_ptr<ScalarValue<T>> &left,
@@ -213,7 +216,7 @@ std::shared_ptr<ScalarValue<T>>
 exp(std::shared_ptr<ScalarValue<T>> val) {
   std::shared_ptr<ScalarValue<T>> tmp;
   auto op_ptr = Operation::exp_ptr<T>;
-  return make_scalar<T>(op_ptr->forward(val->data, 0), val, tmp, Operation::exp_ptr<T>);
+  return make_scalar<T>(op_ptr->forward(val->data, 0), val, tmp, op_ptr);
 }
 } // namespace Scalar
 
@@ -224,13 +227,13 @@ struct fmt::formatter<Scalar::ScalarValue<T>> : formatter<string_view> {
   auto format(const Scalar::ScalarValue<T> &sv, FormatContext &ctx) const
       -> decltype(ctx.out()) {
     // ctx.out() is an output iterator to write to.
-    return fmt::format_to(ctx.out(), "{}(data={}, grad={})", sv.label, sv.data,
-                          sv.grad);
+    return fmt::format_to(ctx.out(), "{}(data={}, grad={}, op={})", sv.label, sv.data,
+                          sv.grad, *sv.op, sv.op->get_type());
   }
 };
 
 template <typename T>
-struct fmt::formatter<std::shared_ptr<Scalar::ScalarValue<T>>>
+    struct fmt::formatter<std::shared_ptr<Scalar::ScalarValue<T>>>
     : formatter<string_view> {
 
   template <typename FormatContext>
