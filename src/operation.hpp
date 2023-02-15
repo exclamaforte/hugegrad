@@ -1,6 +1,5 @@
 #pragma once
 #include <cmath>
-#include <fmt/format.h>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -183,31 +182,3 @@ namespace Operation {
   template <typename T> static Exp<T> *exp_ptr = &exp_singleton<T>;
 
 } // namespace Operation
-
-template <typename T>
-struct fmt::formatter<Operation::Operation<T>> : formatter<string_view> {
-
-  template <typename FormatContext>
-  auto format(const Operation::Operation<T> &sv,
-              FormatContext &ctx) const -> decltype(ctx.out()) {
-    return fmt::format_to(ctx.out(), "{}", sv.get_symbol());
-  }
-};
-
-template <>
-struct fmt::formatter<Operation::OpType> : formatter<string_view> {
-
-  template <typename FormatContext>
-  auto format(const Operation::OpType &ot, FormatContext &ctx) const
-      -> decltype(ctx.out()) {
-    switch (ot) {
-    case Operation::OpType::NONE:
-      return fmt::format_to(ctx.out(), "NONE");
-    case Operation::OpType::UNARY:
-      return fmt::format_to(ctx.out(), "UNARY");
-    case Operation::OpType::BINARY:
-      return fmt::format_to(ctx.out(), "BINARY");
-    }
-    return ctx.out();
-  }
-};

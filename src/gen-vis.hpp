@@ -1,4 +1,5 @@
 #pragma once
+#include "formatting.hpp"
 #include "scalar.hpp"
 #include <cstdlib>
 #include <fstream>

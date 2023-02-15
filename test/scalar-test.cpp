@@ -1,4 +1,5 @@
 #include "scalar.hpp"
+#include "formatting.hpp"
 #include "topo.hpp"
 #include <gtest/gtest.h>
 using namespace ScalarNS;

@@ -239,26 +239,3 @@ Scalar<T> exp(Scalar<T> val) {
   return make_scalar<T>(op_ptr->forward(val->data, 0), val, tmp, op_ptr);
 }
 } // namespace Scalar
-
-template <typename T>
-struct fmt::formatter<ScalarNS::ScalarValue<T>> : formatter<string_view> {
-
-  template <typename FormatContext>
-  auto format(const ScalarNS::ScalarValue<T> &sv, FormatContext &ctx) const
-      -> decltype(ctx.out()) {
-    // ctx.out() is an output iterator to write to.
-    return fmt::format_to(ctx.out(), "{}(data={}, grad={}, op={})", sv.label, sv.data,
-                          sv.grad, *sv.op, sv.op->get_type());
-  }
-};
-
-template <typename T>
-struct fmt::formatter<ScalarNS::Scalar<T>> : formatter<string_view> {
-
-  template <typename FormatContext>
-  auto format(const ScalarNS::Scalar<T> &sv,
-              FormatContext &ctx) const -> decltype(ctx.out()) {
-    // ctx.out() is an output iterator to write to.
-    return fmt::format_to(ctx.out(), "{}", *sv);
-  }
-};
