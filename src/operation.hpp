@@ -5,7 +5,6 @@
 #include <unordered_map>
 namespace Operation {
 
-// TODO turn this into a class with forward and backward methods
   enum class OpType { NONE, UNARY, BINARY };
 
   // unary operators ignore the 2nd argument
@@ -117,8 +116,6 @@ namespace Operation {
 
   template <typename T>
   static OpCache<Pow<T>, T> pow_cache;
-
-  // TODO add static array of pows for fast access of low powers
 
   template <typename T>
   struct None : Operation<T> {
