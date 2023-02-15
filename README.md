@@ -1,10 +1,9 @@
-Do it bigly with the hottest new C++ ML Framework :P
+Implements Autograd. Core is < 600 lines of formatted c++ code. Inspired by PyTorch and Karpathy's implementation:
 
-Implements Autograd.
+https://www.youtube.com/watch?v=VMj-3S1tku0&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ
 
 Mostly for learning.
 
-Accomplishes hundreds of lines of python in thousands of lines of C++.
 
 ## Build
 cmake -S . -B ./build && cmake --build build

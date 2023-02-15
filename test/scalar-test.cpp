@@ -14,6 +14,7 @@ protected:
     b = make_scalar<int>(-100, "b");
     f = make_scalar<float>(-100.0, "f");
     f2 = make_scalar<float>(100.0, "f");
+    d = make_scalar<double>(50.0, "f");
   }
   Scalar<int> x;
   Scalar<short> y;
@@ -23,6 +24,7 @@ protected:
   Scalar<int> b;
   Scalar<float> f;
   Scalar<float> f2;
+  Scalar<double> d;
 };
 
 TEST_F(ScalarTest, equality) {
@@ -75,6 +77,12 @@ TEST_F(ScalarTest, exp) {
   auto ee = make_scalar<double>(std::exp(1.0));
   EXPECT_EQ(e, ee);
 }
+
+TEST_F(ScalarTest, tanh_exp) {
+  EXPECT_EQ(tanh(f), tanh_exp(f));
+  EXPECT_EQ(tanh(d), tanh_exp(d));
+}
+
 TEST_F(ScalarTest, pow) {
   auto v = pow(x, 2);
   int result = 10000;
@@ -90,8 +98,14 @@ TEST_F(ScalarTest, neg_pow) {
 TEST_F(ScalarTest, div) {
   auto v = f / f2;
   float result = -1.0;
-  // TODO pow(100, -1) = 0 because integer
   EXPECT_EQ(result, v);
+}
+
+TEST_F(ScalarTest, neg) {
+  auto v = -f;
+  float result = 100.0;
+  EXPECT_EQ(result, v);
+  EXPECT_EQ(-(-x), x);
 }
 
 TEST_F(ScalarTest, backprop1) {
@@ -163,7 +177,7 @@ TEST_F(ScalarTest, backprop3) {
   sum->label = "x1w1 + x2w2";
   auto n = sum + b;
   n->label = "x1w1 + x2w2 + b";
-  auto o = tanh(n);
+  auto o = tanh_exp(n);
   o->label = "output";
 
   backpropagate({o});
@@ -176,7 +190,7 @@ TEST_F(ScalarTest, backprop3) {
   EXPECT_FLOAT_EQ(x2w2->grad, 0.5);
   EXPECT_FLOAT_EQ(x2->grad, 0.5);
   EXPECT_FLOAT_EQ(w2->grad, 0.0);
-  EXPECT_FLOAT_EQ(x1->grad, -1.5);
+  EXPECT_FLOAT_EQ(x1->grad, -1.5000007);
   EXPECT_FLOAT_EQ(w1->grad, 1.0);
 }
 // TODO multiple output test

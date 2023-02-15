@@ -7,6 +7,7 @@
 #include <string>
 #include <tuple>
 #include <cmath>
+#include <type_traits>
 namespace ScalarNS {
 
 template <typename T> struct ScalarValue;
@@ -117,6 +118,8 @@ Scalar<T> make_scalar(T data, Scalar<T> &child1, Scalar<T> &child2,
   return Scalar<T>(new ScalarValue<T>(data, child1, child2, op));
 }
 
+template <typename T>
+concept arithmetic = std::integral<T> || std::floating_point<T>;
 
 template <typename T>
 Scalar<T> operator+(Scalar<T> left, Scalar<T> right) {
@@ -124,20 +127,40 @@ Scalar<T> operator+(Scalar<T> left, Scalar<T> right) {
   return make_scalar(op_ptr->forward(left->data, right->data), left, right, op_ptr);
 }
 
-template <typename T>
-Scalar<T> operator+(T left, Scalar<T> right) {
-  auto left_val = make_scalar(left);
+template <typename T, arithmetic K>
+Scalar<T> operator+(K left, Scalar<T> right) {
+  auto left_val = make_scalar(static_cast<T>(left));
   auto op_ptr = Operation::add_ptr<T>;
   return make_scalar(op_ptr->forward(left_val->data, right->data), left_val, right,
                      op_ptr);
 }
 
-template <typename T>
-Scalar<T> operator+(Scalar<T> left, T right) {
-  auto right_val = make_scalar(right);
+template <typename T, arithmetic K>
+Scalar<T> operator+(Scalar<T> left, K right) {
+  auto right_val = make_scalar(static_cast<T>(right));
   auto op_ptr = Operation::add_ptr<T>;
   return make_scalar(op_ptr->forward(left->data, right_val->data), left,
                      right_val, op_ptr);
+}
+
+template <typename T>
+Scalar<T> operator-(Scalar<T> left) {
+  return left * -1;
+}
+
+template <typename T>
+Scalar<T> operator-(Scalar<T> left, Scalar<T> right) {
+  return left + -right;
+}
+
+template <typename T, arithmetic K>
+Scalar<T> operator-(K left, Scalar<T> right) {
+  return left + -right;
+}
+
+template <typename T, arithmetic K>
+Scalar<T> operator-(Scalar<T> left, K right) {
+  return left + -right;
 }
 
 template <typename T>
@@ -146,17 +169,18 @@ Scalar<T> operator*(Scalar<T> left, Scalar<T> right) {
   return make_scalar(op_ptr->forward(left->data, right->data), left, right, op_ptr);
 }
 
-template <typename T>
-Scalar<T> operator*(T left, Scalar<T> right) {
-  auto left_val = make_scalar(left);
+template <typename T, arithmetic K>
+Scalar<T> operator*(K left, Scalar<T> right) {
+  auto left_val = make_scalar(static_cast<K>(left));
   auto op_ptr = Operation::mul_ptr<T>;
   return make_scalar(op_ptr->forward(left_val->data, right->data), left_val, right,
                      op_ptr);
 }
 
-template <typename T>
-Scalar<T> operator*(Scalar<T> left, T right) {
-  auto right_val = make_scalar(right);
+
+template <typename T, arithmetic K>
+Scalar<T> operator*(Scalar<T> left, K right) {
+  auto right_val = make_scalar(static_cast<T>(right));
   auto op_ptr = Operation::mul_ptr<T>;
   return make_scalar(op_ptr->forward(left->data, right_val->data), left, right_val, op_ptr);
 }
@@ -200,6 +224,12 @@ Scalar<T> tanh(Scalar<T> val) {
   Scalar<T> tmp;
   auto op_ptr = Operation::tanh_ptr<T>;
   return make_scalar<T>(op_ptr->forward(val->data, 0), val, tmp, op_ptr);
+}
+
+template <std::floating_point T>
+Scalar<T> tanh_exp(Scalar<T> val) {
+  return (exp(static_cast<T>(2.0) * val) - static_cast<T>(1.0)) /
+         (exp(static_cast<T>(2.0) * val) + static_cast<T>(1.0));
 }
 
 template <typename T>
