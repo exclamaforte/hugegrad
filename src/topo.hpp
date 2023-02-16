@@ -18,7 +18,6 @@ void topo_visit(ScalarNS::Scalar<T> node, TopoType<T> &t)
   if (node->seen == ScalarNS::SeenMark::TMP) {
     throw new std::runtime_error("Cycle detected in topological sort.");
   }
-  fmt::print("tsra: {}\n", node);
   node->seen = ScalarNS::SeenMark::TMP;
   switch (node->op->get_type()) {
   case Operation::OpType::BINARY:
@@ -41,7 +40,6 @@ TopoType<T> topological_sort(std::initializer_list<ScalarNS::Scalar<T>> outputs)
 {
   TopoType<T> ret;
   for (const auto& o : outputs) {
-    fmt::print("arst: {}\n", o);
     topo_visit(o, ret);
   }
   return ret;
@@ -55,9 +53,7 @@ void backpropagate(std::initializer_list<ScalarNS::Scalar<T>> outputs)
   for (const auto &i : outputs) {
     i->grad = 1;
   }
-  fmt::print("arsttsra: {}\n", sorted);
   for (auto i = sorted.rbegin(); i != sorted.rend(); ++i) {
-    fmt::print("tsraarst: {}\n", *i);
     (*i)->propagate_gradient();
   }
 }
